@@ -6,6 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver import ActionChains
 
 PATH = f"{os.getcwd()}\\drivers\\chromedriver.exe"
 options = webdriver.chrome.options.Options()
@@ -35,7 +36,7 @@ def scrapeElementsFromUl(div_with_uls):
 
 
 def get_seller_id(seller_link):
-    seller_link.click()
+    ActionChains(driver).click(seller_link).perform()
     WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((
             By.XPATH, "//*[@id='search']/div[1]/div[2]/div/span[3]/div[2]/div[1]/div/span/div/div/span/a/div/img"))
@@ -44,17 +45,30 @@ def get_seller_id(seller_link):
     return text
 
 
-def openTree(tree_id):
+def getInfoAboutProducts():
+    pages = int(driver.find_element_by_xpath('//*[@id="search"]/div[1]/div[2]/div/span[3]/div[2]/div[18]/span/div/div/ul/li[6]').text)
+    content_block = driver.find_elements(By.XPATH, "//span[contains(@class,'a-link-normal a-text-normal')]")
+    return content_block
+
+
+def writeZipCode():
     '''
-    Here we are opening link with top sellers from the category id we got
+    Need to get working Scraper when you live in other countries, nt USA
     '''
-    driver.get(f"https://www.amazon.com/gp/search/other/?pickerToList=enc-merchantbin&node={tree_id}")
     driver.find_element_by_xpath('//*[@id="glow-ingress-line2"]').click()
     zip_code = WebDriverWait(driver, 20).until(
         EC.presence_of_element_located((By.XPATH, '//*[@id="GLUXZipUpdateInput"]')))
     zip_code.send_keys('85001')
     driver.find_element_by_xpath('//*[@id="GLUXZipUpdate"]/span/input').click()
     driver.find_element_by_xpath('//*[@id="a-popover-3"]/div/div[2]/span').click()
+
+
+def openTree(tree_id):
+    '''
+    Here we are opening link with top sellers from the category id we got
+    '''
+    driver.get(f"https://www.amazon.com/gp/search/other/?pickerToList=enc-merchantbin&node={tree_id}")
+    writeZipCode()
     div_with_uls = driver.find_element_by_id("ref_275225011")
     return div_with_uls
 
@@ -69,6 +83,12 @@ if __name__ == "__main__":
     list_of_links = scrapeElementsFromUl(div_with_uls)
     seller_id = get_seller_id(list_of_links[0])
     getSellerInfo(seller_id)
+    print(getInfoAboutProducts())
+
+
+
+
+
 
 
 # //*[@id="ref_275225011"]/ul[1]/li[1]/span/a ref_275225011 ref_275225011
