@@ -47,7 +47,7 @@ def get_seller_id(seller_link):
 
 def getInfoAboutProducts():
     pages = int(driver.find_element_by_xpath('//*[@id="search"]/div[1]/div[2]/div/span[3]/div[2]/div[18]/span/div/div/ul/li[6]').text)
-    content_block = driver.find_elements(By.XPATH, "//span[contains(@class,'a-link-normal a-text-normal')]")
+    content_block = driver.find_elements(By.XPATH, "//div[@data-component-type='s-search-result']")
     return content_block
 
 
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     list_of_links = scrapeElementsFromUl(div_with_uls)
     seller_id = get_seller_id(list_of_links[0])
     getSellerInfo(seller_id)
-    print(getInfoAboutProducts())
+    print(len(getInfoAboutProducts()))
 
 
 
